@@ -1,3 +1,6 @@
-docker build . -t app
-docker run --name app -d -p 8000:5000 --rm app:latest
+docker-compose build
+
+docker-compose up
+
+Еще раз docker-compose up, потому что иначе таблицы не создаются(
  
