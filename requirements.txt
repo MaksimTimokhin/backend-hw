@@ -4,3 +4,5 @@ flask-sqlalchemy
 flask-migrate
 psycopg2
 flask-login
+flask-mail
+pika

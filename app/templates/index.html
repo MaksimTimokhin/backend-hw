@@ -3,6 +3,11 @@
 {% block content %}
     {% if current_user.username %}
     <h1>Hi, {{ current_user.username }}!</h1>
+    {% if current_user.confirmed %}
+    <l>Email confirmed!</l>
+    {% else %}
+    <l>Please confirm your email by following a link in the letter we sent.</l>
+    {% endif %}
     {% else %}
     <h1>Hello!</h1>
     {% endif %}
