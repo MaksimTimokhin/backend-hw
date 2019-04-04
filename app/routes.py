@@ -1,11 +1,11 @@
 from flask import render_template, flash, redirect, url_for
-from app import app, db
+from app import app, db, channel
 from app.forms import LoginForm, RegistrationForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
 from app.token import generate_confirmation_token, confirm_token
-from app.email import send_email
 from datetime import datetime
+import pika
 
 @app.route('/')
 @app.route('/index')
@@ -41,12 +41,14 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        token = generate_confirmation_token(user.email)
-        confirm_url = url_for('confirm_email', token=token, _external=True)
-        html = render_template('user/activate.html', confirm_url=confirm_url)
-        subject = "Please confirm your email"
-        send_email(user.email, subject, html)
-
+        while True:
+            try:
+                channel.basic_publish(exchange='', routing_key='emails', body=user.email)
+                break
+            except:
+                connection = pika.BlockingConnection(pika.URLParameters('amqp://guest:guest@rabbitmq:5672'))
+                channel = connection.channel()
+                channel.queue_declare(queue='emails')
         login_user(user)
 
         flash('A confirmation email has been sent via email.', 'success')
